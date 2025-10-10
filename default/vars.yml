@@ -1,0 +1,29 @@
+salesforce_domain:
+  type: string
+  lib: custom
+  description: Salesforce domain
+  value: "''"
+salesforce_api_version:
+  type: string
+  lib: custom
+  value: "'v64.0'"
+salesforce_oauth_clientid:
+  type: string
+  lib: custom
+  value: "''"
+  description: Salesforce Client ID for oath
+salesforce_objects:
+  type: array
+  lib: custom
+  description: List of Objects to bring in through collector
+  value: >-
+    [
+        {
+          "query": "SELECT LoginHistory.Id, LoginHistory.LoginTime, LoginHistory.UserId, LoginHistory.LoginType, LoginHistory.Status, LoginHistory.Platform, LoginHistory.SourceIp, LoginHistory.CountryIso, LoginHistory.Browser, LoginHistory.Application, LoginHistory.ClientVersion, LoginHistory.APIversion, LoginHistory.LoginUrl FROM LoginHistory",
+          "cursor": "LoginTime"
+        },
+        {
+          "query": "SELECT SetupAuditTrail.Id, SetupAuditTrail.CreatedById, SetupAuditTrail.DelegateUser, SetupAuditTrail.Action, SetupAuditTrail.Display, SetupAuditTrail.Section, SetupAuditTrail.CreatedDate FROM SetupAuditTrail",
+          "cursor": "CreatedDate"
+        }
+    ]

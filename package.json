@@ -1,0 +1,1 @@
+{"name":"cribl-salesforce-rest-io","version":"1.0.0","minLogStreamVersion":"4.14.0","author":"Cribl Packs Team","description":"Pack to collect Salesforce Event Log File data from Salesforce API","displayName":"Salesforce Rest Collector IO","tags":{"streamtags":[],"dataType":["logs"],"useCase":["routing"]},"exports":[]}

@@ -1,0 +1,26 @@
+id: default
+groups: {}
+comments: []
+routes:
+  - id: QVgJE5
+    name: Salesforce Collector
+    final: true
+    disabled: false
+    pipeline: passthru
+    description: Salesforce Collector
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __packsource == 'cribl-salesforce-rest-io.salesforce-api'
+    clones: []
+    output: default
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    enableOutputExpression: false
+    outputExpression: null
+    filter: "true"
+    clones: []
+    output: default

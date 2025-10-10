@@ -1,0 +1,27 @@
+salesforce_eventlogfile_apexcallout:
+  type: csv
+  lib: custom
+  description: Salesforce EventLogFile ApexCallout Event Type
+  fields:
+    - CLIENT_IP
+    - CPU_TIME
+    - EVENT_TYPE
+    - LOGIN_KEY
+    - METHOD
+    - ORGANIZATION_ID
+    - REQUEST_ID
+    - REQUEST_SIZE
+    - RESPONSE_SIZE
+    - RUN_TIME
+    - SESSION_KEY
+    - STATUS_CODE
+    - SUCCESS
+    - TIME
+    - TIMESTAMP
+    - TIMESTAMP_DERIVED
+    - TYPE
+    - URI
+    - URI_ID_DERIVED
+    - URL
+    - USER_ID
+    - USER_ID_DERIVED

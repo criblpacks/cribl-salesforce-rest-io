@@ -1,0 +1,148 @@
+in_cribl_salesforce:
+  type: collection
+  ttl: 4h
+  ignoreGroupJobsLimit: false
+  removeFields: []
+  resumeOnBoot: false
+  schedule:
+    cronSchedule: "*/5 * * * *"
+    maxConcurrentRuns: 1
+    skippable: true
+    run:
+      rescheduleDroppedTasks: true
+      maxTaskReschedule: 1
+      logLevel: info
+      jobTimeout: 60m
+      mode: run
+      timeRangeType: relative
+      timeWarning: {}
+      expression: "true"
+      minTaskSize: 1MB
+      maxTaskSize: 10MB
+      stateTracking:
+        stateUpdateExpression: "__timestampExtracted !== false && {latestTime:
+          (state.latestTime || 0) > _time ? state.latestTime : _time}"
+        stateMergeExpression: "(prevState.latestTime || 0) > newState.latestTime ?
+          prevState : newState"
+        enabled: true
+    enabled: false
+  streamtags: []
+  workerAffinity: false
+  collector:
+    conf:
+      discovery:
+        discoverType: http
+        discoverMethod: get
+        pagination:
+          type: none
+        enableStrictDiscoverParsing: false
+        enableDiscoverCode: true
+        discoverUrl: "`https://<salesforce_domain>/services/data/<salesforce_api_versio\
+          n>/query?q=SELECT Id,CreatedDate,Interval,LogDate,LogFile FROM
+          EventLogFile WHERE Interval = 'Hourly' AND CreatedDate >= ` +  new
+          Date(earliest ? earliest*1000 : Date.now()-960*1000).toISOString() + `
+          AND CreatedDate < ` +  new Date(latest ? latest*1000 :
+          Date.now()-60*1000).toISOString() + ` ORDER BY CreatedDate ASC NULLS
+          FIRST`"
+        discoverRequestParams: []
+        discoverDataField: records
+        formatResultCode: >+
+          // Set a static discovery result of list of Salesforce queries and
+          cursors.
+
+          // The cursor is the time field used to set time range fo the events.
+
+          const queries = [
+              {
+                "query": "SELECT LoginHistory.Id, LoginHistory.LoginTime, LoginHistory.UserId, LoginHistory.LoginType, LoginHistory.Status, LoginHistory.Platform, LoginHistory.SourceIp, LoginHistory.CountryIso, LoginHistory.Browser, LoginHistory.Application, LoginHistory.ClientVersion, LoginHistory.APIversion, LoginHistory.LoginUrl FROM LoginHistory",
+                "cursor": "LoginTime"
+              },
+              {
+                "query": "SELECT SetupAuditTrail.Id, SetupAuditTrail.CreatedById, SetupAuditTrail.DelegateUser, SetupAuditTrail.Action, SetupAuditTrail.Display, SetupAuditTrail.Section, SetupAuditTrail.CreatedDate FROM SetupAuditTrail",
+                "cursor": "CreatedDate"
+              }
+          ]
+
+
+          // Add static discovery results to already obtained.
+
+          __e["records"] = (__e["records"] || []).concat(queries);
+
+      collectMethod: get
+      pagination:
+        type: response_body
+        maxPages: 0
+        nextRelationAttribute: next
+        attribute: []
+      authentication: oauth
+      timeout: 0
+      useRoundRobinDns: false
+      disableTimeFilter: true
+      decodeUrl: true
+      rejectUnauthorized: false
+      captureHeaders: false
+      safeHeaders: []
+      retryRules:
+        type: backoff
+        interval: 1000
+        limit: 5
+        multiplier: 2
+        maxIntervalMs: 20000
+        codes:
+          - 429
+          - 503
+        enableHeader: true
+        retryConnectTimeout: false
+        retryConnectReset: false
+        retryHeaderName: retry-after
+      __scheduling:
+        stateTracking: {}
+      loginUrl: "`https://<salesforce_domain>/services/oauth2/token`"
+      authHeaderKey: Authorization
+      authHeaderExpr: "`Bearer ${token}`"
+      clientSecretParamName: client_secret
+      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
+      tokenRespAttribute: access_token
+      collectUrl: "`https://<salesforce_domain>` + (LogFile ?
+        `/services/data/<salesforce_api_version>/sobjects/EventLogFile/${Id}/Lo\
+        gFile` : (nextRecordsUrl ||
+        `/services/data/${C.vars.salesforce_api_version}/query`))"
+      collectRequestParams:
+        - name: q
+          value: "nextRecordsUrl === undefined ? query + ' WHERE ' + cursor + ' >= ' + new
+            Date(earliest ? earliest*1000 : Date.now()-960*1000).toISOString() +
+            ' AND ' + cursor + ' < ' + new Date(latest ? latest*1000 :
+            Date.now()-60*1000).toISOString() + ` ORDER BY ${cursor} ASC`: ''"
+      authRequestParams:
+        - name: grant_type
+          value: "'client_credentials'"
+        - name: client_id
+          value: "'<salesforce client id>'"
+      clientSecretParamValue: "YOUR_CLIENT_SECRET"
+      collectRequestHeaders: []
+      username: "'YOUR_USERNAME'"
+      password: "'YOUR_PASSWORD"
+    destructive: false
+    encoding: utf8
+    type: rest
+  input:
+    type: collection
+    staleChannelFlushMs: 10000
+    sendToRoutes: true
+    preprocess:
+      disabled: true
+    throttleRatePerSec: "0"
+    breakerRulesets:
+      - Salesforce Ruleset
+    metadata:
+      - name: __packsource
+        value: "'cribl-salesforce-rest-io.salesforce-api'"
+  savedState: {}
+  description: >-
+    This Cribl REST collector enables a compact way to get:
+
+
+    - Salesforce records using the Query endpoint and
+
+    - Salesforce event monitoring content from EventLogFile records using the sObject Blob Get endpoint.  
+  notifications: []

@@ -1,0 +1,3 @@
+object,query,cursor
+LoginHistory,"SELECT LoginHistory.Id, LoginHistory.LoginTime, LoginHistory.UserId, LoginHistory.LoginType, LoginHistory.Status, LoginHistory.Platform, LoginHistory.SourceIp, LoginHistory.CountryIso, LoginHistory.Browser, LoginHistory.Application, LoginHistory.ClientVersion, LoginHistory.APIversion, LoginHistory.LoginUrl FROM LoginHistory",LoginTime
+SetupAuditTrail,"SELECT SetupAuditTrail.Id, SetupAuditTrail.CreatedById, SetupAuditTrail.DelegateUser, SetupAuditTrail.Action, SetupAuditTrail.Display, SetupAuditTrail.Section, SetupAuditTrail.CreatedDate FROM SetupAuditTrail",CreatedDate
