@@ -1,4 +1,4 @@
-in_cribl_salesforce:
+in_salesforce_api:
   type: collection
   ttl: 4h
   ignoreGroupJobsLimit: false
@@ -37,31 +37,50 @@ in_cribl_salesforce:
           type: none
         enableStrictDiscoverParsing: false
         enableDiscoverCode: true
-        discoverUrl: "`https://<salesforce_domain>/services/data/<salesforce_api_versio\
-          n>/query?q=SELECT Id,CreatedDate,Interval,LogDate,LogFile FROM
-          EventLogFile WHERE Interval = 'Hourly' AND CreatedDate >= ` +  new
-          Date(earliest ? earliest*1000 : Date.now()-960*1000).toISOString() + `
-          AND CreatedDate < ` +  new Date(latest ? latest*1000 :
+        discoverUrl: "`https://${C.vars['salesforce_domain']}/services/data/${C.vars['s\
+          alesforce_api_version']}/query?q=SELECT
+          Id,CreatedDate,Interval,LogDate,LogFile FROM EventLogFile WHERE
+          Interval = 'Hourly' AND CreatedDate >= ` +  new Date(earliest ?
+          earliest*1000 : Date.now()-960*1000).toISOString() + ` AND CreatedDate
+          < ` +  new Date(latest ? latest*1000 :
           Date.now()-60*1000).toISOString() + ` ORDER BY CreatedDate ASC NULLS
           FIRST`"
         discoverRequestParams: []
         discoverDataField: records
         formatResultCode: >+
-          // Set a static discovery result of list of Salesforce queries and
+          // Set the discovery results of list of Salesforce queries and
           cursors.
+
+          // The cursor is the time field used to set the time range for the events.
+
+          // Additional Salesforce queries can be added under Knowledge > Variables > salesforce_objects
+
+          const queries = C.vars['salesforce_objects']
+
+
+          // Set a static discovery result of list of Salesforce queries and cursors.
 
           // The cursor is the time field used to set time range fo the events.
 
-          const queries = [
-              {
-                "query": "SELECT LoginHistory.Id, LoginHistory.LoginTime, LoginHistory.UserId, LoginHistory.LoginType, LoginHistory.Status, LoginHistory.Platform, LoginHistory.SourceIp, LoginHistory.CountryIso, LoginHistory.Browser, LoginHistory.Application, LoginHistory.ClientVersion, LoginHistory.APIversion, LoginHistory.LoginUrl FROM LoginHistory",
-                "cursor": "LoginTime"
-              },
-              {
-                "query": "SELECT SetupAuditTrail.Id, SetupAuditTrail.CreatedById, SetupAuditTrail.DelegateUser, SetupAuditTrail.Action, SetupAuditTrail.Display, SetupAuditTrail.Section, SetupAuditTrail.CreatedDate FROM SetupAuditTrail",
-                "cursor": "CreatedDate"
-              }
-          ]
+          // const queries = [
+
+          //     {
+
+          //       "query": "SELECT LoginHistory.Id, LoginHistory.LoginTime, LoginHistory.UserId, LoginHistory.LoginType, LoginHistory.Status, LoginHistory.Platform, LoginHistory.SourceIp, LoginHistory.CountryIso, LoginHistory.Browser, LoginHistory.Application, LoginHistory.ClientVersion, LoginHistory.APIversion, LoginHistory.LoginUrl FROM LoginHistory",
+
+          //       "cursor": "LoginTime"
+
+          //     },
+
+          //     {
+
+          //       "query": "SELECT SetupAuditTrail.Id, SetupAuditTrail.CreatedById, SetupAuditTrail.DelegateUser, SetupAuditTrail.Action, SetupAuditTrail.Display, SetupAuditTrail.Section, SetupAuditTrail.CreatedDate FROM SetupAuditTrail",
+
+          //       "cursor": "CreatedDate"
+
+          //     }
+
+          // ]
 
 
           // Add static discovery results to already obtained.
@@ -81,6 +100,7 @@ in_cribl_salesforce:
       decodeUrl: true
       rejectUnauthorized: false
       captureHeaders: false
+      stopOnEmptyResults: false
       safeHeaders: []
       retryRules:
         type: backoff
@@ -97,15 +117,15 @@ in_cribl_salesforce:
         retryHeaderName: retry-after
       __scheduling:
         stateTracking: {}
-      loginUrl: "`https://<salesforce_domain>/services/oauth2/token`"
+      loginUrl: "`https://${C.vars['salesforce_domain']}/services/oauth2/token`"
       authHeaderKey: Authorization
       authHeaderExpr: "`Bearer ${token}`"
       clientSecretParamName: client_secret
       loginBody: '`{ "username": "${username}", "password": "${password}" }`'
       tokenRespAttribute: access_token
-      collectUrl: "`https://<salesforce_domain>` + (LogFile ?
-        `/services/data/<salesforce_api_version>/sobjects/EventLogFile/${Id}/Lo\
-        gFile` : (nextRecordsUrl ||
+      collectUrl: "`https://${C.vars['salesforce_domain']}` + (LogFile ?
+        `/services/data/${C.vars['salesforce_api_version']}/sobjects/EventLogFi\
+        le/${Id}/LogFile` : (nextRecordsUrl ||
         `/services/data/${C.vars.salesforce_api_version}/query`))"
       collectRequestParams:
         - name: q
@@ -117,11 +137,11 @@ in_cribl_salesforce:
         - name: grant_type
           value: "'client_credentials'"
         - name: client_id
-          value: "'<salesforce client id>'"
-      clientSecretParamValue: "YOUR_CLIENT_SECRET"
+          value: "`${C.vars['salesforce_oauth_clientid']}`"
+      clientSecretParamValue: YOUR_CLIENT_SECRET
       collectRequestHeaders: []
-      username: "'YOUR_USERNAME'"
-      password: "'YOUR_PASSWORD"
+      username: changeme
+      password: changeme
     destructive: false
     encoding: utf8
     type: rest
@@ -145,4 +165,3 @@ in_cribl_salesforce:
     - Salesforce records using the Query endpoint and
 
     - Salesforce event monitoring content from EventLogFile records using the sObject Blob Get endpoint.  
-  notifications: []

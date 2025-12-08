@@ -1,17 +1,18 @@
 salesforce_domain:
   type: string
   lib: custom
-  description: Salesforce domain
-  value: "''"
+  description: "REQUIRED: Your Salesforce domain"
+  value: "'YOUR_SALESFORCE_DOMAIN'"
 salesforce_api_version:
   type: string
   lib: custom
   value: "'v64.0'"
+  description: "REQUIRED: Salesforce API version"
 salesforce_oauth_clientid:
   type: string
   lib: custom
-  value: "''"
-  description: Salesforce Client ID for oath
+  value: "'YOUR_SALESFORCE_CLIENTID'"
+  description: "REQUIRED: Your Salesforce Client ID for OAuth"
 salesforce_objects:
   type: array
   lib: custom
