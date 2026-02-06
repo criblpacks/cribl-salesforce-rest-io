@@ -39,8 +39,13 @@ Upgrading certain Cribl Packs using the same Pack ID can have unintended consequ
 
 ## Release Notes
 
+### Verison 1.1.1
+- Fixed a bug in the Collector preventing OAUTH from working.
+- Removed included Splunk HEC Destination
+
 ### Version 1.1.0
 - Most Collector configuration is now done using variables.
+
 ### Version 1.0.0
 - Initial release
 
