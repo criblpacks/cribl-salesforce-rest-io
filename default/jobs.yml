@@ -140,8 +140,6 @@ in_salesforce_api:
           value: "`${C.vars['salesforce_oauth_clientid']}`"
       clientSecretParamValue: YOUR_CLIENT_SECRET
       collectRequestHeaders: []
-      username: changeme
-      password: changeme
     destructive: false
     encoding: utf8
     type: rest
