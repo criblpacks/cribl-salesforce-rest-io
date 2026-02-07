@@ -121,7 +121,6 @@ in_salesforce_api:
       authHeaderKey: Authorization
       authHeaderExpr: "`Bearer ${token}`"
       clientSecretParamName: client_secret
-      loginBody: '`{ "username": "${username}", "password": "${password}" }`'
       tokenRespAttribute: access_token
       collectUrl: "`https://${C.vars['salesforce_domain']}` + (LogFile ?
         `/services/data/${C.vars['salesforce_api_version']}/sobjects/EventLogFi\
