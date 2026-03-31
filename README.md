@@ -2,7 +2,10 @@
 ----
 
 ## About this Pack
-This pack is built as a complete SOURCE + DESTINATION solution (identified by the IO suffix). Data collection and delivery happen entirely within the pack's context, eliminating the need to connect it to globally defined Sources and Destinations. 
+This pack is built as a complete SOURCE + DESTINATION solution (identified by the IO suffix). Data collection and delivery happen entirely within the Pack's context - you can choose how data arrives at a DESTINATION:
+*  *Send to Worker Group Routes* (the default): data is sent to the top-level Worker Group Routes.
+*  *Default Destination*: data is sent to the Worker Group's [Default Destination](https://docs.cribl.io/stream/destinations-default/). 
+*  *In-Pack Destination*: data is sent to one or more Destinations configured within the Pack.
 
 This Cribl Pack is designed to streamline the collection and processing of event log file events from the Salesforce API. It enables efficient extraction of critical event data, such as user activity, system performance, and security events, directly from Salesforce's Event Log Files (ELF). The pack includes pre-configured pipelines, sources, and transformations to authenticate with the Salesforce API, retrieve log file metadata, and ingest event data into your Cribl Stream environment for further analysis, enrichment, or routing. Ideal for organizations looking to monitor Salesforce environments, enhance security observability, or derive operational insights from event data.
 
@@ -10,10 +13,9 @@ Additionally Salesforce objects such as LoginHistory and SetupAuditTrail are inc
 
 ## Deployment
 
-* This pack is configured by default to use the Worker Group's *Default Destination*.
-* To use the *Default Destination*: No changes are required. The pack will route the data to the destination currently set as the Default on the Worker Group.
-* To use a different Destination: You must update the pack's routes to specify your desired Destination.
-* For immediate functionality without requiring Pack route filter expression modifications, every bundled Source within this pack adds a hidden field: `__packsource`. This field allows for seamless routing based on the Pack source.
+* Every bundled Source within this pack adds a hidden field: `__packsource`. This field allows for simplified routing based on the Pack source.
+* This pack is configured by default to use the Destination *Send to Worker Group Routes*. You *must* add either a Worker Group Route or rely on the Default Destination.
+* To explicitly use the Worker Group's *Default Destination*, change the Pack's Routes to *default:default*. The Pack will then route the data to the destination currently set as the Default on the Worker Group.
 
 ### Configure the Collector
 Some configuration items are required for pulling data from the Salesforce API. Navigate to Knowledge > Variables, update the following with your values:
@@ -38,6 +40,8 @@ Once everything is configured, perform a Commit & Deploy to enable data collecti
 Upgrading certain Cribl Packs using the same Pack ID can have unintended consequences. See [Upgrading an Existing Pack](https://docs.cribl.io/stream/packs#upgrading) for details.
 
 ## Release Notes
+### Version 2.0.0
+* Updated Route Destinations to "Send to Worker Group Routes". See above for details.
 
 ### Verison 1.1.2
 - Fixed a bug in the Collector preventing OAUTH from working.
